@@ -2,8 +2,9 @@ import torch
 from transformers import AutoProcessor, OwlViTForObjectDetection
 
 
-processor = AutoProcessor.from_pretrained("google/owlvit-base-patch16")
-model = OwlViTForObjectDetection.from_pretrained("google/owlvit-base-patch16").eval()
+checkpoint = 'google/owlvit-large-patch14'
+processor = AutoProcessor.from_pretrained(checkpoint)
+model = OwlViTForObjectDetection.from_pretrained(checkpoint).eval()
 
 
 def predict(images, class_names, confidence_threshold):
@@ -15,7 +16,7 @@ def predict(images, class_names, confidence_threshold):
         outputs = model(**inputs)
     target_sizes = torch.tensor([images[0].size[::-1]])
     results = processor.post_process_object_detection(
-        outputs=outputs, threshold=confidence_threshold, target_sizes=target_sizes)
+        outputs=outputs, target_sizes=target_sizes, threshold=confidence_threshold)
     detections = [[]]
     for i in range(len(images)):
         boxes, scores, labels = results[i]["boxes"], results[i]["scores"], results[i]["labels"]
